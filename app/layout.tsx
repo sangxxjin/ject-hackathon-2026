@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "그 나이에 걔는",
-  description: "나이를 넣으면, 그 나이에 그 선수가 뭘 했는지 판독해 드립니다.",
+  title: "GAP — 선수와 나 사이의 차이",
+  description: "나이를 넣으면 같은 나이에 선수가 해낸 일과 나 사이의 GAP을 보여주고, 오늘 운동할 이유를 드립니다.",
 };
 
 export const viewport: Viewport = {

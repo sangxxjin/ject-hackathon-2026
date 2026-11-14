@@ -187,7 +187,7 @@ const PlayerCard = forwardRef<
       <p className="text-center text-sm font-semibold">“{oneLiner}”</p>
       <div className="flex flex-col gap-0.5 text-[11px] opacity-80">
         <span>{footer}</span>
-        <span>그 나이에 걔는 · 젝커톤 2026</span>
+        <span>GAP · 선수와의 차이를 운동으로 줄이자</span>
       </div>
     </div>
   );

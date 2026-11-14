@@ -7,7 +7,7 @@ export function SportScreen({ selected, onSelect }: { selected: SportChoice | nu
   return (
     <div className="flex flex-1 flex-col pb-10">
       <Navigation />
-      <Top sub="당신의 나이 값 판독" title="응원하는 종목은?" desc="이 종목 선수들만 나와요" />
+      <Top sub="같은 나이, 선수와 나의 GAP 판독" title="응원하는 종목은?" desc="이 종목 선수들만 나와요" />
       <div className="grid grid-cols-2 gap-3 px-5">
         {SPORT_IDS.map((s) => (
           <Card key={s} selected={selected === s} onClick={() => onSelect(s)} className="flex flex-col gap-3">

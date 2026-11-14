@@ -9,13 +9,33 @@ function cx(...c: (string | false | null | undefined)[]) {
   return c.filter(Boolean).join(" ");
 }
 
+/* ---------- Logo ---------- */
+
+/**
+ * 로고 자리. 로고 파일을 받으면 public/logo.svg로 넣고
+ * 아래 점선 박스를 <img src="/logo.svg" alt="" className="size-7" />로 바꾼다.
+ */
+export function Logo() {
+  return (
+    <span className="flex items-center gap-2">
+      <span
+        aria-hidden="true"
+        className="flex size-7 items-center justify-center rounded-lg border border-dashed border-primary/60 text-[9px] text-primary/70"
+      >
+        로고
+      </span>
+      <span className="font-display text-[22px] tracking-wider text-primary">GAP</span>
+    </span>
+  );
+}
+
 /* ---------- Navigation ---------- */
 
 export function Navigation({ title, onBack, right }: { title?: string; onBack?: () => void; right?: ReactNode }) {
   if (!onBack) {
     return (
       <header className="flex h-14 items-center justify-between px-5">
-        <span className="font-display text-[22px] text-primary">그 나이에 걔는</span>
+        <Logo />
         {right}
       </header>
     );
