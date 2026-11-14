@@ -45,19 +45,19 @@ export function RevealScreen({
       <div className="mt-8 flex flex-col gap-3 px-5">
         <div className="rise" style={delay(2.2)}>
           <Card className="flex gap-3">
-            <RiHourglassLine size={22} className="shrink-0 text-primary" />
+            <RiCakeLine size={22} className="shrink-0 text-primary" />
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-caption">은퇴 카운트다운</span>
-              <span className="text-base text-title">{retireCountdown(r.sport, age)}</span>
+              <span className="text-xs text-caption">생년 모드</span>
+              <span className="text-base text-title">{birthYearLine(r.athlete, r.athleteBirthYear, age)}</span>
             </div>
           </Card>
         </div>
         <div className="rise" style={delay(2.5)}>
           <Card className="flex gap-3">
-            <RiCakeLine size={22} className="shrink-0 text-primary" />
+            <RiHourglassLine size={22} className="shrink-0 text-primary" />
             <div className="flex flex-col gap-0.5">
-              <span className="text-xs text-caption">생년 모드</span>
-              <span className="text-base text-title">{birthYearLine(r.athlete, r.athleteBirthYear, age)}</span>
+              <span className="text-xs text-caption">은퇴 카운트다운</span>
+              <span className="text-base text-title">{retireCountdown(r.sport, age)}</span>
             </div>
           </Card>
         </div>

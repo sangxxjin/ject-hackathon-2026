@@ -163,13 +163,19 @@ function ExerciseSheet({
       <div className="flex w-full flex-col gap-2 rounded-2xl bg-surface p-4">
         <div className="flex items-baseline justify-between">
           <span className="text-sm text-body">선수 카드 OVR 보너스</span>
-          <span className="font-display text-2xl text-primary">+{bonus}</span>
+          <span className="font-display text-2xl text-primary tabular-nums">+{bonus}</span>
         </div>
         <ProgressBar value={progress} />
+        {/* 초 숫자가 한 자리↔두 자리로 바뀌어도 글자가 흔들리지 않게 숫자 폭을 고정한다 */}
         <span className="text-xs text-caption">
-          {bonus >= BONUS_MAX
-            ? `최대 보너스 +${BONUS_MAX} 달성! 이제 진짜 선수입니다.`
-            : `다음 +1까지 ${toNext}초. 오래 할수록 오버롤이 올라가요.`}
+          {bonus >= BONUS_MAX ? (
+            `최대 보너스 +${BONUS_MAX} 달성! 이제 진짜 선수입니다.`
+          ) : (
+            <>
+              다음 +1까지 <span className="inline-block w-[2ch] text-right tabular-nums">{toNext}</span>초. 오래
+              할수록 오버롤이 올라가요.
+            </>
+          )}
         </span>
       </div>
 
