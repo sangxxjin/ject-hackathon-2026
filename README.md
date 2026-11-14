@@ -16,4 +16,4 @@ npm install
 npm run dev
 ```
 
-Next.js + Vercel
+Next.js 16 · TypeScript · Tailwind CSS 4 · OpenAI · Vercel

@@ -1,0 +1,73 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import "tailwindcss";
+
+/* 디자인 토큰 — 팀 피그마 디자인 시스템 다크 모드 값 (docs/spec.md 10.2) */
+:root {
+  --color-background-normal: #111113;
+  --color-background-alternative: #19191b;
+  --color-component-normal: #1b1c1e;
+  --color-component-strong: #292a2d;
+  --color-component-disable: #212328;
+  --color-line-normal: #292a2d;
+  --color-line-alternative: #212328;
+  --color-line-strong: #6c6e79;
+  --color-text-title: #f7f7f8;
+  --color-text-subtitle: #eaebec;
+  --color-text-body: #c2c4c8;
+  --color-text-caption: #989ba2;
+  --color-text-disable: #5f606a;
+  --color-primary-normal: #c6f432;
+  --color-primary-strong: #b8e91c;
+  --color-primary-heavy: #a6d510;
+  --color-primary-weak: #374215;
+  --color-primary-text: #c6f432;
+  --color-label-onprimary: #171719;
+  --color-status-positive: #00bf40;
+  --color-status-cautionary: #ff9200;
+  --color-status-negative: #ff4242;
+  --color-material-dimmer: #171719bd;
+  --color-dark-gray-600: #393a3f;
+
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-14: 14px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-full: 999px;
+
+  --layout-mobile-width: 402px;
+  --layout-side-margin: 20px;
+}
+
+/* Tailwind 유틸리티에서 토큰 이름으로 쓰기: bg-bg, text-title, bg-primary 등 */
+@theme inline {
+  --color-bg: var(--color-background-normal);
+  --color-bg-alt: var(--color-background-alternative);
+  --color-surface: var(--color-component-normal);
+  --color-surface-strong: var(--color-component-strong);
+  --color-line: var(--color-line-normal);
+  --color-title: var(--color-text-title);
+  --color-subtitle: var(--color-text-subtitle);
+  --color-body: var(--color-text-body);
+  --color-caption: var(--color-text-caption);
+  --color-disable: var(--color-text-disable);
+  --color-primary: var(--color-primary-normal);
+  --color-primary-strong: var(--color-primary-strong);
+  --color-primary-heavy: var(--color-primary-heavy);
+  --color-primary-weak: var(--color-primary-weak);
+  --color-onprimary: var(--color-label-onprimary);
+  --color-positive: var(--color-status-positive);
+  --color-negative: var(--color-status-negative);
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+html,
+body {
+  background: var(--color-background-alternative);
+  color: var(--color-text-body);
+  font-family: var(--font-sans);
+  letter-spacing: -0.01em;
+  line-height: 1.5;
+}
