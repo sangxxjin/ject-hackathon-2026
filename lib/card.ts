@@ -1,5 +1,6 @@
 import type { Mode } from "./copy";
 import { ONE_LINERS } from "./copy";
+import { exerciseBonus } from "./prescriptions";
 
 /** 카드 질문 4개 (docs/spec.md 9절). score는 해당 능력치 점수 */
 export const QUESTIONS: { stat: StatName; q: string; options: { text: string; score: number }[] }[] = [
@@ -47,12 +48,17 @@ export type Grade = "소파" | "벤치" | "후보" | "주전" | "에이스";
 export type CardStats = {
   stats: Record<StatName, number>;
   ovr: number;
+  baseOvr: number;
+  bonus: number;
   grade: Grade;
   oneLiner: string;
 };
 
-/** answers: 질문별 선택한 옵션 index. 비어 있으면 가운데 선택지로 계산 */
-export function computeCard(answers: number[], age: number, mode: Mode | null): CardStats {
+/**
+ * answers: 질문별 선택한 옵션 index. 비어 있으면 가운데 선택지로 계산.
+ * exerciseSec: "오늘의 처방 실행"으로 운동한 시간. 30초마다 OVR +1 (최대 +20)
+ */
+export function computeCard(answers: number[], age: number, mode: Mode | null, exerciseSec = 0): CardStats {
   const score = (i: number) => QUESTIONS[i].options[answers[i] ?? 1].score;
   const over25 = Math.max(0, age - 25);
   const stats: Record<StatName, number> = {
@@ -61,7 +67,9 @@ export function computeCard(answers: number[], age: number, mode: Mode | null): 
     변명: Math.round(Math.min(99, score(2) + over25)),
     멘탈: Math.round(Math.min(99, score(3) + (mode === "comfort" ? 10 : 0))),
   };
-  const ovr = Math.round(stats.체력 * 0.3 + stats.의지 * 0.3 + stats.멘탈 * 0.2 + (100 - stats.변명) * 0.2);
+  const baseOvr = Math.round(stats.체력 * 0.3 + stats.의지 * 0.3 + stats.멘탈 * 0.2 + (100 - stats.변명) * 0.2);
+  const bonus = exerciseBonus(exerciseSec);
+  const ovr = Math.min(99, baseOvr + bonus);
   const grade: Grade = ovr < 30 ? "소파" : ovr < 50 ? "벤치" : ovr < 70 ? "후보" : ovr < 85 ? "주전" : "에이스";
 
   // 가장 약한 능력치 (변명은 높을수록 약점)
@@ -75,5 +83,5 @@ export function computeCard(answers: number[], age: number, mode: Mode | null): 
   const pool = ONE_LINERS[weakness[0][0]];
   const oneLiner = pool[(ovr + age) % pool.length];
 
-  return { stats, ovr, grade, oneLiner };
+  return { stats, ovr, baseOvr, bonus, grade, oneLiner };
 }

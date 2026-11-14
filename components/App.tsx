@@ -29,6 +29,8 @@ export function App() {
   const [mode, setMode] = useState<Mode | null>(null);
   const [startedAt, setStartedAt] = useState(0);
   const [toast, setToast] = useState<string | null>(null);
+  /** 오늘의 처방 실행으로 누적한 운동 시간(초). 판독을 새로 하면 0으로 */
+  const [exerciseSec, setExerciseSec] = useState(0);
   const seen = useRef<string[]>([]);
   const runId = useRef(0);
 
@@ -47,6 +49,7 @@ export function App() {
       const id = ++runId.current;
       setResult(null);
       setMode(null);
+      setExerciseSec(0);
       setStartedAt(Date.now());
       go("var");
       let r: JudgeResult;
@@ -133,6 +136,8 @@ export function App() {
           result={result}
           mode={mode}
           nickname={nickname.trim()}
+          exerciseSec={exerciseSec}
+          onExercise={(sec) => setExerciseSec((s) => s + sec)}
           onBack={() => go("mode")}
           onOtherMode={() => go("mode")}
           onCard={() => go("card")}
@@ -146,6 +151,7 @@ export function App() {
           age={clampAge(age)}
           mode={mode}
           nickname={nickname.trim()}
+          exerciseSec={exerciseSec}
           onBack={() => go("result")}
           onFriend={() => go("age")}
           onRestart={() => {

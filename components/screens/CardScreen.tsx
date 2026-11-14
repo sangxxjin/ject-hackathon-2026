@@ -5,6 +5,7 @@ import { Button, FixedBottomCTA, ListRow, Navigation, ProgressStepper, Top } fro
 import { QUESTIONS, computeCard, type Grade, type StatName } from "@/lib/card";
 import type { Mode } from "@/lib/copy";
 import { shortName } from "@/lib/josa";
+import { formatDuration } from "@/lib/prescriptions";
 import type { JudgeResult } from "@/lib/schema";
 import { SPORTS, type SportChoice } from "@/lib/sports";
 
@@ -23,6 +24,7 @@ export function CardScreen({
   age,
   mode,
   nickname,
+  exerciseSec,
   onBack,
   onFriend,
   onRestart,
@@ -33,6 +35,7 @@ export function CardScreen({
   age: number;
   mode: Mode | null;
   nickname: string;
+  exerciseSec: number;
   onBack: () => void;
   onFriend: () => void;
   onRestart: () => void;
@@ -81,7 +84,7 @@ export function CardScreen({
     );
   }
 
-  const card = computeCard(answers, age, mode);
+  const card = computeCard(answers, age, mode, exerciseSec);
 
   const save = async () => {
     if (!cardRef.current) return;
@@ -109,6 +112,7 @@ export function CardScreen({
           ref={cardRef}
           grade={card.grade}
           ovr={card.ovr}
+          bonus={card.bonus}
           stats={card.stats}
           oneLiner={card.oneLiner}
           nickname={nickname || "무명 선수"}
@@ -117,7 +121,12 @@ export function CardScreen({
           footer={`${shortName(result.reveal.athlete)} ${result.reveal.eventAge}세: ${result.reveal.shortFact}`}
         />
       </div>
-      <div className="mt-5 flex justify-center gap-5 text-sm">
+      <p className="mt-4 px-5 text-center text-xs text-caption">
+        {card.bonus > 0
+          ? `오늘의 처방으로 ${formatDuration(exerciseSec)} 운동해서 OVR이 ${card.baseOvr} → ${card.ovr}로 올랐어요.`
+          : "뒤로 가서 오늘의 처방을 실행하면, 운동한 시간만큼 OVR이 올라가요."}
+      </p>
+      <div className="mt-4 flex justify-center gap-5 text-sm">
         <button
           type="button"
           className="text-caption underline underline-offset-2"
@@ -161,14 +170,16 @@ const PlayerCard = forwardRef<
     sportLabel: string;
     age: number;
     footer: string;
+    bonus: number;
   }
->(function PlayerCard({ grade, ovr, stats, oneLiner, nickname, sportLabel, age, footer }, ref) {
+>(function PlayerCard({ grade, ovr, bonus, stats, oneLiner, nickname, sportLabel, age, footer }, ref) {
   return (
     <div ref={ref} className={`flex w-[300px] flex-col gap-4 rounded-[20px] p-5 ${GRADE_STYLE[grade]}`}>
       <div className="flex items-start justify-between">
         <div className="flex flex-col">
           <span className="font-display text-[56px] leading-none">{ovr}</span>
           <span className="mt-1 text-sm font-semibold">OVR · {grade}</span>
+          {bonus > 0 && <span className="text-xs font-semibold opacity-80">오늘 운동 +{bonus}</span>}
         </div>
         <div className="flex flex-col items-end text-sm font-semibold">
           <span>{sportLabel}</span>
