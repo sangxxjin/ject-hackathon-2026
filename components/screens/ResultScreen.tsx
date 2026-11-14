@@ -43,7 +43,7 @@ export function ResultScreen({
   let sub = "";
   if (mode === "comfort") {
     main = result.comfort.line;
-    sub = `${shortName(result.comfort.athlete)} · ${result.comfort.lowAge}세 → ${result.comfort.laterAge}세`;
+    // 보조 문구는 아래에서 나이별 두 줄로 따로 그린다
   } else if (mode === "motivate") {
     main = result.motivate.line;
     sub = `${shortName(result.motivate.athlete)}의 습관: ${result.motivate.habit}`;
@@ -66,6 +66,19 @@ export function ResultScreen({
           <p className="rise text-base text-body" style={{ animationDelay: "0.3s" }}>
             {sub}
           </p>
+        )}
+        {mode === "comfort" && (
+          <div className="rise flex flex-col gap-1.5 text-sm text-body" style={{ animationDelay: "0.3s" }}>
+            <span className="text-caption">{shortName(result.comfort.athlete)}의 기록</span>
+            <p className="flex gap-2">
+              <span className="w-9 shrink-0 font-semibold text-caption">{result.comfort.lowAge}세</span>
+              <span>{result.comfort.lowText.replace(/\.$/, "")}</span>
+            </p>
+            <p className="flex gap-2">
+              <span className="w-9 shrink-0 font-semibold text-primary">{result.comfort.laterAge}세</span>
+              <span className="text-title">{result.comfort.laterText.replace(/\.$/, "")}</span>
+            </p>
+          </div>
         )}
         {mode === "roast" && (
           <Button color="dark" variant="weak" size="m" className="self-start" onClick={() => setRoastIdx((i) => i + 1)}>
