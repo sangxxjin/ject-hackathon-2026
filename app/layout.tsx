@@ -13,12 +13,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className="h-full antialiased">
-      <body className="min-h-full">
-        {/* 모든 화면은 가운데 402px 모바일 컬럼 안에 그린다 (docs/spec.md 10.4) */}
-        <main className="mx-auto flex min-h-dvh w-full max-w-[402px] flex-col bg-bg">
-          {children}
-        </main>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
