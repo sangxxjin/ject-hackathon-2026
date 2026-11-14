@@ -20,7 +20,7 @@
 - AI 호출은 **서버 라우트에서만** (`app/api/judge/route.ts`). API 키는 브라우저에 절대 노출하지 않는다.
 - LLM: **OpenAI API**, 공식 SDK `openai` (npm). **Responses API + 내장 웹 검색 도구**를 쓴다.
 - 모델: 환경 변수 `OPENAI_MODEL`로 바꾼다. 기본값 `gpt-4o-mini`. 웹 검색 도구와 structured outputs를 함께 지원하는 모델이어야 한다.
-- **판독 소스 스위치** `JUDGE_SOURCE`: `ai`(기본, AI 웹 검색 판독) / `curated`(AI 없이 `docs/fallback.md` 기록만 사용).
+- **판독 소스 스위치** `JUDGE_SOURCE`: `hybrid`(기본, 사실은 `docs/fallback.md` 기록, 문구만 AI) / `ai`(AI 웹 검색 판독) / `curated`(AI 없이 기록과 템플릿 문구만).
 
 **실측 결과 (2026-11-14, 이 프로젝트 키로 사용 가능한 모델은 gpt-4o-mini, gpt-5-mini 두 개)**
 
