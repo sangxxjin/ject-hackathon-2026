@@ -6,6 +6,7 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import type { Response } from "openai/resources/responses/responses";
 import { buildFallback } from "./fallback";
+import { judgeHybrid } from "./hybrid";
 import { SYSTEM_PROMPT, buildUserMessage } from "./prompt";
 import { ModelOutputSchema, type JudgeResult, type ModelOutput, type Source } from "./schema";
 import { currentYear, type SportChoice } from "./sports";
@@ -89,7 +90,9 @@ export async function judge(input: { sport: SportChoice; age: number; exclude: s
 }> {
   const started = Date.now();
   const log: string[] = [];
-  if (process.env.JUDGE_SOURCE === "curated") {
+  const sourceMode = process.env.JUDGE_SOURCE || "hybrid";
+  if (sourceMode === "hybrid") return judgeHybrid(input);
+  if (sourceMode === "curated") {
     log.push("JUDGE_SOURCE=curated: 준비된 기록 사용");
     return { result: buildFallback(input.sport, input.age, input.exclude), log };
   }
