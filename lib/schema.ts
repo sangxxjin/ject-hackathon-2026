@@ -51,4 +51,6 @@ export const JudgeRequestSchema = z.object({
   sport: z.string(),
   age: z.number(),
   excludeAthletes: z.array(z.string().max(30)).max(10).default([]),
+  /** 이 브라우저에서 이전에 판독한 횟수. 많을수록 더 다양한 선수와 문구를 고른다 */
+  visit: z.number().default(0),
 });

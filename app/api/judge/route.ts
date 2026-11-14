@@ -20,6 +20,7 @@ export async function POST(request: Request) {
   const sport = parsed.data.sport;
   const age = clampAge(parsed.data.age);
   const exclude = parsed.data.excludeAthletes.map((s) => s.trim()).filter(Boolean);
+  const visit = Math.min(100, Math.max(0, Math.floor(parsed.data.visit) || 0));
   const session = readSession(request);
 
   const json = (body: unknown) => {
@@ -30,15 +31,15 @@ export async function POST(request: Request) {
 
   if (!allowAiCall(session.id)) {
     console.log(`[judge] 호출 제한 ${sport} ${age}세 → fallback`);
-    return json(buildFallback(sport, age, exclude));
+    return json(buildFallback(sport, age, exclude, visit));
   }
 
   try {
-    const { result, log } = await judge({ sport, age, exclude });
-    console.log(`[judge] ${sport} ${age}세 → ${result.source} | ${log.join(" | ")}`);
+    const { result, log } = await judge({ sport, age, exclude, visit });
+    console.log(`[judge] ${sport} ${age}세 방문${visit} → ${result.source} | ${log.join(" | ")}`);
     return json(result);
   } catch (e) {
     console.error("[judge] 예외", e);
-    return json(buildFallback(sport, age, exclude));
+    return json(buildFallback(sport, age, exclude, visit));
   }
 }

@@ -196,9 +196,10 @@ a < 0  → "당신이 태어난 {birthYear}년, {선수}{은/는} 아직 태어�
 
 **요청** `POST /api/judge`
 ```json
-{ "sport": "soccer_world", "age": 26, "excludeAthletes": ["손흥민"] }
+{ "sport": "soccer_world", "age": 26, "excludeAthletes": ["손흥민"], "visit": 3 }
 ```
 - `sport`는 화이트리스트로 검증, `age`는 정수 10~60으로 clamp, `excludeAthletes`는 최대 10개, 각 20자 이하.
+- `visit`은 이 브라우저에서 이전에 판독한 횟수(0~100). 클라이언트가 localStorage(`lib/history.ts`)에 판독 횟수와 최근 선수 5명을 남겨 보낸다. 처음에는 나이가 가장 가까운 슈퍼스타를, 다시 올수록 더 넓은 나이 폭과 덜 유명한 스타까지 고른다 (`docs/fallback.md` 2절). 하이브리드 문구의 temperature도 0.8에서 최대 1.0까지 올린다.
 - 별명은 보내지 않는다. 사용자가 자유롭게 입력한 텍스트는 프롬프트에 들어가지 않는다.
 
 **응답** `200` → `JudgeResult` (7.4) + `source: "ai" | "fallback"`

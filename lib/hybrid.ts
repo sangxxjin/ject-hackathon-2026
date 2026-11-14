@@ -41,11 +41,12 @@ const COPY_PROMPT = `당신은 웹 서비스 "GAP"(선수와 나 사이의 차�
 
 let client: OpenAI | null = null;
 
-export async function judgeHybrid(input: { sport: SportChoice; age: number; exclude: string[] }): Promise<{
+export async function judgeHybrid(input: { sport: SportChoice; age: number; exclude: string[]; visit?: number }): Promise<{
   result: JudgeResult;
   log: string[];
 }> {
-  const base = buildFallback(input.sport, input.age, input.exclude);
+  const visit = input.visit ?? 0;
+  const base = buildFallback(input.sport, input.age, input.exclude, visit);
   const log: string[] = [];
   if (!process.env.OPENAI_API_KEY) return { result: base, log: ["키 없음: 템플릿 문구"] };
 
@@ -69,7 +70,10 @@ export async function judgeHybrid(input: { sport: SportChoice; age: number; excl
     const res = await client.responses.parse(
       {
         model,
-        ...(/^(gpt-5|o\d)/.test(model) ? { reasoning: { effort: "low" as const } } : {}),
+        // 추론 모델은 temperature를 받지 않는다. 일반 모델은 재방문할수록 문구 온도를 올린다 (0.8 → 최대 1.0, 더 올리면 반말·영어가 섞인다)
+        ...(/^(gpt-5|o\d)/.test(model)
+          ? { reasoning: { effort: "low" as const } }
+          : { temperature: Math.min(1.0, 0.8 + 0.05 * visit) }),
         max_output_tokens: /^(gpt-5|o\d)/.test(model) ? 4000 : 700,
         instructions: COPY_PROMPT,
         input: JSON.stringify(facts),

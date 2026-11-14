@@ -84,7 +84,7 @@ async function callModel(
   return { out, sources: extractSources(res) };
 }
 
-export async function judge(input: { sport: SportChoice; age: number; exclude: string[] }): Promise<{
+export async function judge(input: { sport: SportChoice; age: number; exclude: string[]; visit?: number }): Promise<{
   result: JudgeResult;
   log: string[];
 }> {
@@ -94,11 +94,11 @@ export async function judge(input: { sport: SportChoice; age: number; exclude: s
   if (sourceMode === "hybrid") return judgeHybrid(input);
   if (sourceMode === "curated") {
     log.push("JUDGE_SOURCE=curated: 준비된 기록 사용");
-    return { result: buildFallback(input.sport, input.age, input.exclude), log };
+    return { result: buildFallback(input.sport, input.age, input.exclude, input.visit), log };
   }
   if (!process.env.OPENAI_API_KEY) {
     log.push("OPENAI_API_KEY 없음");
-    return { result: buildFallback(input.sport, input.age, input.exclude), log };
+    return { result: buildFallback(input.sport, input.age, input.exclude, input.visit), log };
   }
 
   for (let attempt = 1; attempt <= 2; attempt++) {
@@ -121,5 +121,5 @@ export async function judge(input: { sport: SportChoice; age: number; exclude: s
     }
   }
   log.push(`비상용 결과 사용 (${Date.now() - started}ms)`);
-  return { result: buildFallback(input.sport, input.age, input.exclude), log };
+  return { result: buildFallback(input.sport, input.age, input.exclude, input.visit), log };
 }

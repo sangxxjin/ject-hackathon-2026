@@ -59,6 +59,10 @@ const fallbackSrc = readFileSync(path.join(ROOT, "lib/fallback.ts"), "utf8");
 /** 선수 짧은 이름 → 출생 연도 */
 const KNOWN_BIRTH = {};
 for (const m of fallbackSrc.matchAll(/P\("([^"]+)",\s*(\d{4}),/g)) KNOWN_BIRTH[shortName(m[1])] = Number(m[2]);
+/** "선수|사건 연도" → 유명도 (1: 슈퍼스타, 2: 팬이라면 아는 스타) */
+const FAME = {};
+for (const m of fallbackSrc.matchAll(/P\("([^"]+)",\s*\d{4},\s*(\d{4}),\s*\d+,\s*"[^"]*",\s*"[^"]*"(?:,\s*([12]))?\)/g))
+  FAME[`${shortName(m[1])}|${m[2]}`] = Number(m[3] ?? 1);
 /** 종목 → 템플릿 처방 (AI가 운동 종류·양을 바꿨는지 대조) */
 const BASE_PRESCRIPTION = {};
 for (const m of fallbackSrc.matchAll(/(\w+): \{ athleteFact: "[^"]*", prescription: "([^"]+)" \}/g)) BASE_PRESCRIPTION[m[1]] = m[2];
@@ -115,20 +119,20 @@ function progress(label, done, total) {
 }
 
 // ───────────────────────── 요청 ─────────────────────────
-async function callJudge(sport, age, excludeAthletes = []) {
+async function callJudge(sport, age, excludeAthletes = [], visit = 0) {
   const started = Date.now();
   try {
     const res = await fetch(`${BASE}/api/judge`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ sport, age, excludeAthletes }),
+      body: JSON.stringify({ sport, age, excludeAthletes, visit }),
       signal: AbortSignal.timeout(45_000), // 클라이언트(components/App.tsx)는 40초에서 포기
     });
     const ms = Date.now() - started;
-    if (!res.ok) return { sport, age, excludeAthletes, ms, error: `HTTP ${res.status}` };
-    return { sport, age, excludeAthletes, ms, data: await res.json() };
+    if (!res.ok) return { sport, age, excludeAthletes, visit, ms, error: `HTTP ${res.status}` };
+    return { sport, age, excludeAthletes, visit, ms, data: await res.json() };
   } catch (e) {
-    return { sport, age, excludeAthletes, ms: Date.now() - started, error: String(e.message ?? e) };
+    return { sport, age, excludeAthletes, visit, ms: Date.now() - started, error: String(e.message ?? e) };
   }
 }
 
@@ -223,7 +227,7 @@ function checkQuality(r) {
     if (LIMITS[key] && text.length > LIMITS[key]) issues.push(`너무 김 (${key} ${text.length}자 > ${LIMITS[key]})`);
     if (/(했어|하냐|하니|해라|해|냐|니|야|지|자|을까|될까|거야|잖아|봐|데|네)[.!?…]*$/.test(text.trim()) && !/(니다|세요|까요|네요|데요)[.!?…]*$/.test(text.trim()))
       issues.push(`반말 종결 (${key})`);
-    if (key.startsWith("roast") && /(젊|늙|나이|몇 살|살이죠|살인데)/.test(text)) issues.push(`독설이 나이를 건드림 (${key})`);
+    if (key.startsWith("roast") && /(젊|늙|나이(가|도|를|는|만|값)|몇 살|살이죠|살인데)/.test(text)) issues.push(`독설이 나이를 건드림 (${key})`);
     if (!text.trim()) issues.push(`빈 문구 (${key})`);
   }
   const roasts = r.data.roast.lines;
@@ -327,7 +331,8 @@ async function main() {
   for (const sport of SPORTS) for (const age of AGES) for (let run = 0; run < RUNS; run++) jobs.push({ sport, age, run });
   let done = 0;
   const matrix = await pool(jobs, CONCURRENCY, async (j) => {
-    const r = await callJudge(j.sport, j.age);
+    // run 0은 첫 방문, run k는 k번째 재방문 (제외 목록 없이: 며칠 뒤 다시 온 사람)
+    const r = await callJudge(j.sport, j.age, [], j.run);
     progress("판독 요청", ++done, jobs.length);
     return { ...r, run: j.run, phase: "matrix" };
   });
@@ -342,7 +347,7 @@ async function main() {
       const steps = [];
       for (let i = 0; i < SESSION_STEPS; i++) {
         const age = 28;
-        const r = await callJudge(sport, age, seen.slice(-10));
+        const r = await callJudge(sport, age, seen.slice(-10), i);
         steps.push({ ...r, phase: "session", step: i });
         if (r.data) seen.push(shortName(r.data.reveal.athlete));
       }
@@ -436,7 +441,7 @@ function buildReport(matrix, sessions, all) {
   }
 
   // 4. 다양성
-  L.push("", `## 4. 다양성 (같은 종목·나이로 ${RUNS}번 들어왔을 때)`, "");
+  L.push("", `## 4. 다양성 (같은 종목·나이로 ${RUNS}번 들어왔을 때, 방문 횟수 0~${RUNS - 1})`, "");
   const groups = new Map();
   for (const r of ok) {
     const key = `${r.sport}|${r.age}`;
@@ -471,6 +476,12 @@ function buildReport(matrix, sessions, all) {
           }
       L.push(`| ${FIELD_LABEL[f]} | ${pct(same, pairs)} | ${(simSum / pairs).toFixed(2)} |`);
     }
+  }
+  const fameOf = (r) => FAME[`${shortName(r.data.reveal.athlete)}|${r.data.reveal.eventYear}`];
+  const first = ok.filter((r) => r.run === 0 && fameOf(r));
+  const later = ok.filter((r) => r.run > 0 && fameOf(r));
+  if (first.length) {
+    L.push("", `첫 방문에 슈퍼스타(fame 1)가 나온 비율: **${pct(first.filter((r) => fameOf(r) === 1).length, first.length)}** · 재방문: ${pct(later.filter((r) => fameOf(r) === 1).length, later.length)}`);
   }
   const athletesBySport = SPORTS.map((s) => `${s} ${new Set(ok.filter((r) => r.sport === s).map((r) => shortName(r.data.reveal.athlete))).size}명`);
   L.push("", `종목별 등장한 리빌 선수 수: ${athletesBySport.join(" · ")}`);

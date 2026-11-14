@@ -11,6 +11,7 @@ import { VarScreen } from "@/components/screens/VarScreen";
 import { Toast } from "@/components/ui";
 import type { Mode } from "@/lib/copy";
 import { buildFallback } from "@/lib/fallback";
+import { loadHistory, recordVisit } from "@/lib/history";
 import { shortName } from "@/lib/josa";
 import type { JudgeResult } from "@/lib/schema";
 import { clampAge, isSportChoice, type SportChoice } from "@/lib/sports";
@@ -32,6 +33,8 @@ export function App() {
   /** 오늘의 처방 실행으로 누적한 운동 시간(초). 판독을 새로 하면 0으로 */
   const [exerciseSec, setExerciseSec] = useState(0);
   const seen = useRef<string[]>([]);
+  /** localStorage가 막힌 환경에서도 이번 접속 안의 판독 횟수는 센다 */
+  const sessionVisits = useRef(0);
   const runId = useRef(0);
 
   const go = useCallback((s: Screen) => {
@@ -52,21 +55,27 @@ export function App() {
       setExerciseSec(0);
       setStartedAt(Date.now());
       go("var");
+      // 다시 온 사람일수록 더 다양한 선수가 나오도록 판독 횟수와 최근 선수를 함께 보낸다
+      const history = loadHistory();
+      const visit = Math.max(history.visits, sessionVisits.current);
+      const exclude = [...new Set([...history.seen, ...seen.current])].slice(-10);
       let r: JudgeResult;
       try {
         const res = await fetch("/api/judge", {
           method: "POST",
           headers: { "content-type": "application/json" },
-          body: JSON.stringify({ sport: s, age: a, excludeAthletes: seen.current.slice(-10) }),
+          body: JSON.stringify({ sport: s, age: a, excludeAthletes: exclude, visit }),
           signal: AbortSignal.timeout(CLIENT_TIMEOUT_MS),
         });
         if (!res.ok) throw new Error(String(res.status));
         r = (await res.json()) as JudgeResult;
       } catch {
-        r = buildFallback(s, a, seen.current);
+        r = buildFallback(s, a, exclude, visit);
       }
       if (id !== runId.current) return; // 그사이 다시 시작한 경우
       seen.current.push(shortName(r.reveal.athlete));
+      sessionVisits.current = visit + 1;
+      recordVisit(shortName(r.reveal.athlete));
       setResult(r);
     },
     [go],
