@@ -118,6 +118,13 @@ const WORKOUTS: Record<SportId, { athleteFact: string; prescription: string }> =
   esports: { athleteFact: "프로게이머도 체력 관리로 운동을 따로 합니다.", prescription: "손목 말고 하체를 쓰세요. 스쿼트 20번." },
 };
 
+/** 이 파일에 있는 선수들의 출생 연도. AI가 이 선수를 고르면 출생 연도를 대조한다. */
+export const KNOWN_BIRTH_YEARS: Record<string, number> = Object.fromEntries(
+  Object.values(PEAKS)
+    .flat()
+    .map((p) => [shortName(p.athlete), p.birthYear]),
+);
+
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
