@@ -79,5 +79,5 @@ GAP은 같은 나이의 선수와 나 사이의 차이를 뜻합니다. 그 차�
 
 ## 7. 서비스 URL
 
-- 서비스: (배포 URL)
+- 서비스: https://gap-motivation.vercel.app/
 - GitHub: https://github.com/sangxxjin/ject-hackathon-2026

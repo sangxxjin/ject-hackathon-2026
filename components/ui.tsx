@@ -11,21 +11,11 @@ function cx(...c: (string | false | null | undefined)[]) {
 
 /* ---------- Logo ---------- */
 
-/**
- * 로고 자리. 로고 파일을 받으면 public/logo.svg로 넣고
- * 아래 점선 박스를 <img src="/logo.svg" alt="" className="size-7" />로 바꾼다.
- */
+/** GAP 로고 (public/logo.svg, 원본 79×39). 파비콘은 app/icon.svg */
 export function Logo() {
   return (
-    <span className="flex items-center gap-2">
-      <span
-        aria-hidden="true"
-        className="flex size-7 items-center justify-center rounded-lg border border-dashed border-primary/60 text-[9px] text-primary/70"
-      >
-        로고
-      </span>
-      <span className="font-display text-[22px] tracking-wider text-primary">GAP</span>
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/logo.svg" alt="GAP" width={65} height={32} className="h-8 w-auto" />
   );
 }
 
