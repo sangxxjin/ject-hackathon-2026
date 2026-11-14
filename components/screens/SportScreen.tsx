@@ -11,7 +11,7 @@ export function SportScreen({ selected, onSelect }: { selected: SportChoice | nu
       <div className="grid grid-cols-2 gap-3 px-5">
         {SPORT_IDS.map((s) => (
           <Card key={s} selected={selected === s} onClick={() => onSelect(s)} className="flex flex-col gap-3">
-            <span className="text-primary">
+            <span className="flex h-8 items-center text-primary">
               <SportIcon sport={s} size={28} />
             </span>
             <span className="text-base font-semibold text-title">{SPORTS[s].label}</span>

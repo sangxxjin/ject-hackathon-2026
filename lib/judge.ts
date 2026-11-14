@@ -16,7 +16,7 @@ import { validateOutput } from "./validate";
  * 클라이언트는 40초에서 비상용 결과로 넘어간다 (lib/copy.ts VAR_LINES와 맞출 것).
  */
 export const TOTAL_BUDGET_MS = 37_000;
-const RETRY_IF_UNDER_MS = 12_000; // 빠른 모델(gpt-4o-mini)일 때만 재시도할 여유가 생긴다
+const RETRY_IF_UNDER_MS = 10_000; // 첫 시도가 빨리 끝났을 때만 재시도 (실패 시 최대 대기 약 22초)
 
 let client: OpenAI | null = null;
 function getClient(): OpenAI {
@@ -67,6 +67,8 @@ async function callModel(
     {
       model,
       ...(isReasoning ? { reasoning: { effort: "low" as const } } : {}),
+      // 정상 응답은 약 600토큰. gpt-4o-mini가 가끔 제어 문자를 반복하며 멈추지 않을 때 빨리 끊고 재시도한다
+      max_output_tokens: isReasoning ? 8000 : 1500,
       instructions: SYSTEM_PROMPT,
       input: buildUserMessage({ ...input, year: currentYear() }),
       tools: [{ type: "web_search" }],

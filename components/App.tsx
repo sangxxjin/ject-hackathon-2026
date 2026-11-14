@@ -139,9 +139,10 @@ export function App() {
           onToast={showToast}
         />
       )}
-      {screen === "card" && result && (
+      {screen === "card" && result && sport && (
         <CardScreen
           result={result}
+          sport={sport}
           age={clampAge(age)}
           mode={mode}
           nickname={nickname.trim()}

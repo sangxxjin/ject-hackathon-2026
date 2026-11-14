@@ -6,7 +6,7 @@ import { QUESTIONS, computeCard, type Grade, type StatName } from "@/lib/card";
 import type { Mode } from "@/lib/copy";
 import { shortName } from "@/lib/josa";
 import type { JudgeResult } from "@/lib/schema";
-import { SPORTS } from "@/lib/sports";
+import { SPORTS, type SportChoice } from "@/lib/sports";
 
 const GRADE_STYLE: Record<Grade, string> = {
   소파: "bg-surface-strong text-body",
@@ -19,6 +19,7 @@ const GRADE_STYLE: Record<Grade, string> = {
 /** S7. 선수 카드: 질문 4개 → 카드 발급 */
 export function CardScreen({
   result,
+  sport,
   age,
   mode,
   nickname,
@@ -28,6 +29,7 @@ export function CardScreen({
   onToast,
 }: {
   result: JudgeResult;
+  sport: SportChoice;
   age: number;
   mode: Mode | null;
   nickname: string;
@@ -115,7 +117,23 @@ export function CardScreen({
           footer={`${shortName(result.reveal.athlete)} ${result.reveal.eventAge}세: ${result.reveal.shortFact}`}
         />
       </div>
-      <div className="mt-5 flex justify-center gap-4 text-sm">
+      <div className="mt-5 flex justify-center gap-5 text-sm">
+        <button
+          type="button"
+          className="text-caption underline underline-offset-2"
+          onClick={async () => {
+            // 별명은 링크에 넣지 않는다 (docs/spec.md 8절)
+            const url = `${window.location.origin}/?age=${age}&sport=${sport}`;
+            try {
+              await navigator.clipboard.writeText(url);
+              onToast("판독 링크를 복사했어요");
+            } catch {
+              onToast(url);
+            }
+          }}
+        >
+          판독 링크 복사
+        </button>
         <button type="button" className="text-caption underline underline-offset-2" onClick={onRestart}>
           처음으로
         </button>
