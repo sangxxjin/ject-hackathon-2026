@@ -208,6 +208,35 @@ export default function IntroPage() {
           </dl>
         </Section>
 
+        <Section title="호출 제한">
+          <p>
+            AI 호출은 횟수로 막습니다. 시연장은 여러 폰이 같은 공유기를 쓰므로
+            접속 주소(IP)로는 세지 않습니다. 브라우저마다 구분을 붙여 그
+            브라우저만 셉니다.
+          </p>
+          <ul className="mt-4 flex flex-col gap-3">
+            <li>
+              <Em>한 브라우저, 10분에 20번.</Em> 한 사람이 시연하면서 여러 번
+              돌려볼 수 있는 양입니다. 옆 사람은 따로 셉니다.
+            </li>
+            <li>
+              <Em>그 서버 전체, 10분에 800번.</Em> 시연으로 닿기 어려운 수이고,
+              호출이 끝없이 쌓이는 것만 막습니다.
+            </li>
+            <li>
+              한도를 넘기면 OpenAI를 호출하지 않고, 팀이 검증해 둔 비상용
+              기록으로 넘깁니다. 화면은 그대로 이어집니다.
+            </li>
+            <li>
+              구분은 로그인 없이 브라우저 쿠키로 남기고, 하루 뒤 사라집니다.
+            </li>
+            <li>
+              이 횟수는 서버 메모리에 있어서, 서버가 나뉘면 한도도 나뉩니다.
+              비용의 최종 상한은 OpenAI 사용 한도입니다.
+            </li>
+          </ul>
+        </Section>
+
         <Section title="6. 사용한 기술 스택 및 인프라">
           <h3 className="text-sm font-semibold text-subtitle">기술 스택</h3>
           <ul className="mt-3 flex flex-wrap gap-2">
